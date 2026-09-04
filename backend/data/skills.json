@@ -1,0 +1,13 @@
+{
+  "technical": [
+    "JavaScript", "Python", "React", "Node.js", "SQL", "MongoDB",
+    "Java", "C++", "HTML/CSS", "Git", "REST APIs", "Data Structures & Algorithms",
+    "Machine Learning", "Cloud Basics (AWS/Azure)", "Excel", "Power BI",
+    "Figma/UI Design", "Android/iOS Development", "Cybersecurity Basics", "DevOps Basics"
+  ],
+  "soft": [
+    "Communication", "Teamwork", "Leadership", "Problem Solving",
+    "Time Management", "Adaptability", "Critical Thinking", "Creativity",
+    "Public Speaking", "Negotiation"
+  ]
+}
