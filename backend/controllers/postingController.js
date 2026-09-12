@@ -1,4 +1,6 @@
 const Posting = require('../models/Posting');
+const StudentProfile = require('../models/StudentProfile');
+const { calculateMatchScore } = require('../utils/matchingEngine');
 
 // CREATE A POSTING (industry only)
 exports.createPosting = async (req, res) => {
@@ -45,6 +47,41 @@ exports.getMyPostings = async (req, res) => {
 
     const postings = await Posting.find({ industry_id: req.user.id });
     res.status(200).json(postings);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// GET RANKED MATCHES FOR THE LOGGED-IN STUDENT
+exports.getMatches = async (req, res) => {
+  try {
+    if (req.user.role !== 'student') {
+      return res.status(403).json({ message: 'Only students can view matches' });
+    }
+
+    const profile = await StudentProfile.findOne({ user_id: req.user.id });
+    if (!profile) {
+      return res.status(404).json({ message: 'Student profile not found' });
+    }
+
+    const openPostings = await Posting.find({ status: 'open' }).populate('industry_id', 'name email');
+
+    const rankedMatches = openPostings.map(posting => {
+      const scores = calculateMatchScore(profile.skills, posting.required_skills);
+      return {
+        posting_id: posting._id,
+        title: posting.title,
+        description: posting.description,
+        industry: posting.industry_id,
+        required_skills: posting.required_skills,
+        ...scores
+      };
+    });
+
+    // sort highest final_score first
+    rankedMatches.sort((a, b) => b.final_score - a.final_score);
+
+    res.status(200).json(rankedMatches);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
